@@ -34,5 +34,6 @@
     </dependencyManagement>
 
     <modules>
+        <module>auth-service</module>
     </modules>
 </project>
