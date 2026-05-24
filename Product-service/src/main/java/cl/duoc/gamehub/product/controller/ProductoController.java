@@ -17,19 +17,18 @@ public class ProductoController {
     @Autowired
     private ProductoService productoService;
 
-    // Crear un producto nuevo (POST)
+    // Crear producto usando el formato exacto del PDF de la materia
     @PostMapping("/crear")
     public ResponseEntity<Producto> registrarProducto(@Valid @RequestBody Producto producto) {
         Producto nuevoProducto = productoService.guardarProducto(producto);
-        // Retorna HTTP 201 Created exigido en el PDF de ResponseEntity
-        return new ResponseEntity<>(nuevoProducto, HttpStatus.CREATED);
+        // Formato exacto exigido en la diapo de Duoc:
+        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoProducto);
     }
 
-    // Listar todos los productos (GET)
+    // Listar catálogo
     @GetMapping("/listar")
     public ResponseEntity<List<Producto>> obtenerCatalogo() {
         List<Producto> lista = productoService.listarTodos();
-        // Retorna HTTP 200 OK
-        return new ResponseEntity<>(lista, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(lista);
     }
 }

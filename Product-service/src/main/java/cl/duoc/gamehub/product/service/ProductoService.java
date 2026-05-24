@@ -11,23 +11,19 @@ import java.util.List;
 @Service
 public class ProductoService {
 
-    // Instancia obligatoria por rúbrica para Logs estructurados
+    // Log idéntico al solicitado en la materia para trazabilidad en consola
     private static final Logger log = LoggerFactory.getLogger(ProductoService.class);
 
     @Autowired
     private ProductoRepository productoRepository;
 
-    // Guardar Producto en Laragon
     public Producto guardarProducto(Producto producto) {
-        log.info("Iniciando persistencia del producto gamer: [{}]", producto.getNombre());
-        Producto guardado = productoRepository.save(producto);
-        log.info("Producto registrado exitosamente en la BD. ID Generado: {}", guardado.getId());
-        return guardado;
+        log.info("Guardando un nuevo producto...");
+        return productoRepository.save(producto);
     }
 
-    // Listar todo el catálogo
     public List<Producto> listarTodos() {
-        log.info("Se ha solicitado la lista completa de productos para el catálogo.");
+        log.info("Listando todos los productos...");
         return productoRepository.findAll();
     }
 }

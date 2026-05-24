@@ -2,29 +2,17 @@ package cl.duoc.gamehub.product.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.util.HashMap;
-import java.util.Map;
-
-@ControllerAdvice // Captura excepciones globales de la API
+@ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Capturar errores cuando falla Bean Validation (@NotBlank, @Min, etc.)
+    // Captura el error de validación (400 Bad Request) según la tabla oficial de tu clase
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> manejarErroresValidacion(MethodArgumentNotValidException ex) {
-        Map<String, String> errores = new HashMap<>();
-
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String nombreCampo = ((FieldError) error).getField();
-            String mensajeError = error.getDefaultMessage();
-            errores.put(nombreCampo, mensajeError);
-        });
-
-        // Retorna un HTTP 400 Bad Request ordenado con los campos que fallaron
-        return new ResponseEntity<>(errores, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<String> manejarErroresValidacion(MethodArgumentNotValidException ex) {
+        // Devuelve un mensaje simple y el estado 400 sin códigos raros ni avanzados
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error de validación: Verifique que los campos obligatorios, precio y stock sean correctos.");
     }
 }
