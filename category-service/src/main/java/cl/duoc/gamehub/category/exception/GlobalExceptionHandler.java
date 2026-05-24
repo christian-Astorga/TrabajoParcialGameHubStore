@@ -13,7 +13,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Si el usuario deja el nombre vacío o se pasa de caracteres, cae aquí
+    // Si el usuario deja el nombre vacío
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> erroresDeValidacion(MethodArgumentNotValidException ex) {
         Map<String, String> errores = new HashMap<>();
@@ -27,7 +27,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errores, HttpStatus.BAD_REQUEST);
     }
 
-    // Si salta un error de negocio (como nombre repetido), cae aquí
+    // Si salta un error de negocio
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, String>> erroresDeNegocio(RuntimeException ex) {
         Map<String, String> errorJson = new HashMap<>();
