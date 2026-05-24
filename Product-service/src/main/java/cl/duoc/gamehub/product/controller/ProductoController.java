@@ -62,7 +62,7 @@ public class ProductoController {
         return ResponseEntity.status(HttpStatus.OK).body(actualizado);
     }
 
-    // 5. DESACTIVAR (Eliminación lógica)
+
     @DeleteMapping("/desactivar/{id}")
     public ResponseEntity<Producto> desactivar(@PathVariable Long id) {
         Producto desactivado = productoService.desactivarProducto(id);
