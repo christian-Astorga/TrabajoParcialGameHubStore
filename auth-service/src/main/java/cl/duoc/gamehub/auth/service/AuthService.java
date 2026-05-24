@@ -1,9 +1,8 @@
 package cl.duoc.gamehub.auth.service;
 
-import cl.duoc.gamehub.auth.model.Auth;
+import cl.duoc.gamehub.auth.model.CuentaAcceso;
 import cl.duoc.gamehub.auth.repository.AuthRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -11,39 +10,22 @@ import java.util.Optional;
 @Service
 public class AuthService {
 
-    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
-    private final AuthRepository authRepository;
+    @Autowired
+    private AuthRepository authRepository;
 
-    public AuthService(AuthRepository authRepository) {
-        this.authRepository = authRepository;
-    }
+    public String autenticar(String email, String password) {
+        Optional<CuentaAcceso> usuarioOpt = authRepository.findByEmail(email);
 
-    public String registrarUsuario(Auth auth) {
-        log.info("Intentando registrar al usuario: {}", auth.getUsername());
-        Optional<Auth> existente = authRepository.findByUsername(auth.getUsername());
-        if (existente.isPresent()) {
-            log.warn("Registro fallido: El usuario {} ya existe", auth.getUsername());
-            return "Error: El nombre de usuario ya está en uso.";
+        if (usuarioOpt.isEmpty()) {
+            throw new RuntimeException("Credenciales inválidas: El correo no existe.");
         }
-        authRepository.save(auth);
-        log.info("Usuario {} registrado exitosamente.", auth.getUsername());
-        return "Usuario registrado exitosamente.";
-    }
 
-    public String iniciarSesion(String username, String password) {
-        log.info("Intento de login para el usuario: {}", username);
-        Optional<Auth> existente = authRepository.findByUsername(username);
-        if (existente.isPresent()) {
-            Auth user = existente.get();
-            if (user.getPassword().equals(password)) {
-                log.info("Login exitoso para el usuario: {}", username);
-                return "Login exitoso. Bienvenido " + user.getNombre();
-            } else {
-                log.warn("Login fallido para {}: Contraseña incorrecta", username);
-                return "Error: Contraseña incorrecta";
-            }
+        CuentaAcceso usuario = usuarioOpt.get();
+        if ("INACTIVO".equals(usuario.getEstado())) {
+            throw new RuntimeException("Acceso denegado: El usuario está inactivo.");
         }
-        log.warn("Login fallido: El usuario {} no existe", username);
-        return "Error: El usuario no existe";
+
+        // Simulación de contraseña exitosa (en un entorno real usarías BCrypt)
+        return "Login exitoso. Token generado para el usuario con Rol: " + usuario.getRol();
     }
 }
