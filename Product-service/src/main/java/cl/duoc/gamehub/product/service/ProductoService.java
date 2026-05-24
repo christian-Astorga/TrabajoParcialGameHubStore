@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 public class ProductoService {
 
-    // Log idéntico al solicitado en la materia para trazabilidad en consola
+
     private static final Logger log = LoggerFactory.getLogger(ProductoService.class);
 
     @Autowired

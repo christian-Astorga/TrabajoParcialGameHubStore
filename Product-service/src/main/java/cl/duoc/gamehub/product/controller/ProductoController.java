@@ -17,15 +17,15 @@ public class ProductoController {
     @Autowired
     private ProductoService productoService;
 
-    // Crear producto usando el formato exacto del PDF de la materia
+
     @PostMapping("/crear")
     public ResponseEntity<Producto> registrarProducto(@Valid @RequestBody Producto producto) {
         Producto nuevoProducto = productoService.guardarProducto(producto);
-        // Formato exacto exigido en la diapo de Duoc:
+
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoProducto);
     }
 
-    // Listar catálogo
+
     @GetMapping("/listar")
     public ResponseEntity<List<Producto>> obtenerCatalogo() {
         List<Producto> lista = productoService.listarTodos();
