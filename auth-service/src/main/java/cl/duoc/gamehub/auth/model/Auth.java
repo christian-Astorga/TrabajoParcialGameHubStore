@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "usuarios")
-public class Usuario {
+public class Auth {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +25,7 @@ public class Usuario {
     @Column(nullable = false)
     private String nombre;
 
-    public Usuario() {}
+    public Auth() {}
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

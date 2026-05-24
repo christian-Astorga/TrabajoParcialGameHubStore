@@ -2,8 +2,8 @@ package cl.duoc.gamehub.auth.controller;
 
 import cl.duoc.gamehub.auth.dto.LoginRequestDTO;
 import cl.duoc.gamehub.auth.dto.RegistroRequestDTO;
-import cl.duoc.gamehub.auth.model.Usuario;
-import cl.duoc.gamehub.auth.service.UsuarioService;
+import cl.duoc.gamehub.auth.model.Auth;
+import cl.duoc.gamehub.auth.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,21 +12,21 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-public class UsuarioController { // Nombre corregido e idéntico al archivo .java
+public class AuthController { // Nombre corregido e idéntico al archivo .java
 
     @Autowired
-    private UsuarioService usuarioService;
+    private AuthService authService;
 
     // Registrar un nuevo usuario usando DTO
     @PostMapping("/registrar")
     public ResponseEntity<String> registrarCuenta(@Valid @RequestBody RegistroRequestDTO dto) {
         // Traspaso manual del DTO a la Entidad real de tu proyecto
-        Usuario usuario = new Usuario();
-        usuario.setUsername(dto.getUsername());
-        usuario.setPassword(dto.getPassword());
-        usuario.setNombre(dto.getNombre());
+        Auth auth = new Auth();
+        auth.setUsername(dto.getUsername());
+        auth.setPassword(dto.getPassword());
+        auth.setNombre(dto.getNombre());
 
-        String resultado = usuarioService.registrarUsuario(usuario);
+        String resultado = authService.registrarUsuario(auth);
 
         if (resultado.contains("Error")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resultado);
@@ -37,7 +37,7 @@ public class UsuarioController { // Nombre corregido e idéntico al archivo .jav
     // Iniciar Sesión usando DTO
     @PostMapping("/login")
     public ResponseEntity<String> login(@Valid @RequestBody LoginRequestDTO dto) {
-        String resultado = usuarioService.iniciarSesion(dto.getUsername(), dto.getPassword());
+        String resultado = authService.iniciarSesion(dto.getUsername(), dto.getPassword());
 
         if (resultado.contains("Error")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(resultado);

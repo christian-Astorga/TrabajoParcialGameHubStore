@@ -1,7 +1,7 @@
 package cl.duoc.gamehub.auth.service;
 
-import cl.duoc.gamehub.auth.model.Usuario;
-import cl.duoc.gamehub.auth.repository.UsuarioRepository;
+import cl.duoc.gamehub.auth.model.Auth;
+import cl.duoc.gamehub.auth.repository.AuthRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -9,32 +9,32 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class UsuarioService {
+public class AuthService {
 
-    private static final Logger log = LoggerFactory.getLogger(UsuarioService.class);
-    private final UsuarioRepository usuarioRepository;
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
+    private final AuthRepository authRepository;
 
-    public UsuarioService(UsuarioRepository usuarioRepository) {
-        this.usuarioRepository = usuarioRepository;
+    public AuthService(AuthRepository authRepository) {
+        this.authRepository = authRepository;
     }
 
-    public String registrarUsuario(Usuario usuario) {
-        log.info("Intentando registrar al usuario: {}", usuario.getUsername());
-        Optional<Usuario> existente = usuarioRepository.findByUsername(usuario.getUsername());
+    public String registrarUsuario(Auth auth) {
+        log.info("Intentando registrar al usuario: {}", auth.getUsername());
+        Optional<Auth> existente = authRepository.findByUsername(auth.getUsername());
         if (existente.isPresent()) {
-            log.warn("Registro fallido: El usuario {} ya existe", usuario.getUsername());
+            log.warn("Registro fallido: El usuario {} ya existe", auth.getUsername());
             return "Error: El nombre de usuario ya está en uso.";
         }
-        usuarioRepository.save(usuario);
-        log.info("Usuario {} registrado exitosamente.", usuario.getUsername());
+        authRepository.save(auth);
+        log.info("Usuario {} registrado exitosamente.", auth.getUsername());
         return "Usuario registrado exitosamente.";
     }
 
     public String iniciarSesion(String username, String password) {
         log.info("Intento de login para el usuario: {}", username);
-        Optional<Usuario> existente = usuarioRepository.findByUsername(username);
+        Optional<Auth> existente = authRepository.findByUsername(username);
         if (existente.isPresent()) {
-            Usuario user = existente.get();
+            Auth user = existente.get();
             if (user.getPassword().equals(password)) {
                 log.info("Login exitoso para el usuario: {}", username);
                 return "Login exitoso. Bienvenido " + user.getNombre();
