@@ -1,21 +1,18 @@
 package cl.duoc.gamehub.user.service;
 
+import cl.duoc.gamehub.user.dto.DireccionDTO;
+import cl.duoc.gamehub.user.dto.UsuarioDTO;
 import cl.duoc.gamehub.user.model.Direccion;
 import cl.duoc.gamehub.user.model.Usuario;
 import cl.duoc.gamehub.user.repository.DireccionRepository;
 import cl.duoc.gamehub.user.repository.UsuarioRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UsuarioService {
-
-    private static final Logger log = LoggerFactory.getLogger(UsuarioService.class);
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -23,52 +20,86 @@ public class UsuarioService {
     @Autowired
     private DireccionRepository direccionRepository;
 
-    public Usuario guardarUsuario(Usuario usuario) {
-        log.info("Guardando un nuevo usuario: {}", usuario.getNombre());
-        Optional<Usuario> existente = usuarioRepository.findByEmail(usuario.getEmail());
-        if (existente.isPresent()) {
-            throw new RuntimeException("El correo electronico ya esta registrado");
+    // 1. Crear Usuario
+    public Usuario crearUsuario(UsuarioDTO dto) {
+        if (usuarioRepository.findByEmail(dto.getEmail()).isPresent()) {
+            throw new RuntimeException("Error de negocio: El correo electronico ya esta registrado");
         }
+        Usuario usuario = new Usuario();
+        usuario.setNombre(dto.getNombre());
+        usuario.setEmail(dto.getEmail());
+        usuario.setTelefono(dto.getTelefono());
+        usuario.setRol(dto.getRol().toUpperCase());
+        usuario.setEstado("ACTIVO");
         return usuarioRepository.save(usuario);
     }
 
-    public List<Usuario> listarTodos() {
-        log.info("Listando todos los usuarios...");
-        return usuarioRepository.findAll();
-    }
+    // 2. Crear Dirección
+    public Direccion crearDireccion(DireccionDTO dto) {
+        usuarioRepository.findById(dto.getUsuarioId())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado para asociar la direccion"));
 
-    public Optional<Usuario> buscarPorId(Long id) {
-        log.info("Buscando usuario con ID: {}", id);
-        return usuarioRepository.findById(id);
-    }
-
-    public Usuario actualizarUsuario(Long id, Usuario datosNuevos) {
-        log.info("Actualizando datos del usuario con ID: {}", id);
-        return usuarioRepository.findById(id).map(usuario -> {
-            usuario.setNombre(datosNuevos.getNombre());
-            usuario.setTelefono(datosNuevos.getTelefono());
-            usuario.setRol(datosNuevos.getRol());
-            return usuarioRepository.save(usuario);
-        }).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-    }
-
-    public Usuario desactivarUsuario(Long id) {
-        log.info("Desactivando lógicamente el usuario con ID: {}", id);
-        return usuarioRepository.findById(id).map(usuario -> {
-            usuario.setEstado("INACTIVO");
-            return usuarioRepository.save(usuario);
-        }).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-    }
-
-    public Direccion guardarDireccion(Direccion direccion) {
-        log.info("Guardando direccion para el usuario ID: {}", direccion.getUsuarioId());
-        usuarioRepository.findById(direccion.getUsuarioId())
-                .orElseThrow(() -> new RuntimeException("Usuario asociado no existe"));
+        Direccion direccion = new Direccion();
+        direccion.setUsuarioId(dto.getUsuarioId());
+        direccion.setComuna(dto.getComuna());
+        direccion.setCiudad(dto.getCiudad());
+        direccion.setCalle(dto.getCalle());
+        direccion.setNumero(dto.getNumero());
         return direccionRepository.save(direccion);
     }
 
-    public List<Direccion> listarDireccionesPorUsuario(Long usuarioId) {
-        log.info("Listando direcciones del usuario ID: {}", usuarioId);
-        return direccionRepository.findByUsuarioId(usuarioId);
+    // 3. Listar todos
+    public List<Usuario> listarTodos() {
+        return usuarioRepository.findAll();
+    }
+
+    // 4. Listar por Rol (Exigido en Rúbrica)
+    public List<Usuario> listarPorRol(String rol) {
+        return usuarioRepository.findByRol(rol.toUpperCase());
+    }
+
+    // 5. Listar por Estado (Exigido en Rúbrica)
+    public List<Usuario> listarPorEstado(String estado) {
+        return usuarioRepository.findByEstado(estado.toUpperCase());
+    }
+
+    // 6. Buscar por ID
+    public Usuario buscarPorId(Long id) {
+        return usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    }
+
+    // 7. Actualizar Usuario (Corregido: YA NO USA getEstado para evitar la línea roja)
+    public Usuario actualizarUsuario(Long id, UsuarioDTO dto) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        usuario.setNombre(dto.getNombre());
+        usuario.setTelefono(dto.getTelefono());
+        usuario.setRol(dto.getRol().toUpperCase());
+        // El estado se mantiene intacto como estaba en la base de datos
+
+        return usuarioRepository.save(usuario);
+    }
+
+    // 8. Actualizar Dirección
+    public Direccion actualizarDireccion(Long id, DireccionDTO dto) {
+        Direccion dir = direccionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Direccion no encontrada"));
+
+        dir.setComuna(dto.getComuna());
+        dir.setCiudad(dto.getCiudad());
+        dir.setCalle(dto.getCalle());
+        dir.setNumero(dto.getNumero());
+
+        return direccionRepository.save(dir);
+    }
+
+    // 9. Desactivar Usuario (Eliminación Lógica)
+    public Usuario desactivarUsuario(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        usuario.setEstado("INACTIVO");
+        return usuarioRepository.save(usuario);
     }
 }

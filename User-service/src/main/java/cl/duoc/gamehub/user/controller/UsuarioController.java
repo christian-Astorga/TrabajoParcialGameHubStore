@@ -21,64 +21,45 @@ public class UsuarioController {
     private UsuarioService usuarioService;
 
     @PostMapping("/crear")
-    public ResponseEntity<Usuario> registrarUsuario(@Valid @RequestBody UsuarioDTO dto) {
-        Usuario usuario = new Usuario();
-        usuario.setNombre(dto.getNombre());
-        usuario.setEmail(dto.getEmail());
-        usuario.setTelefono(dto.getTelefono());
-        usuario.setRol(dto.getRol());
-        usuario.setEstado("ACTIVO");
-
-        Usuario nuevo = usuarioService.guardarUsuario(usuario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevo);
-    }
-
-    @GetMapping("/listar")
-    public ResponseEntity<List<Usuario>> obtenerUsuarios() {
-        List<Usuario> lista = usuarioService.listarTodos();
-        return ResponseEntity.status(HttpStatus.OK).body(lista);
-    }
-
-    @GetMapping("/buscar/{id}")
-    public ResponseEntity<Usuario> obtenerPorId(@PathVariable Long id) {
-        return usuarioService.buscarPorId(id)
-                .map(usuario -> ResponseEntity.status(HttpStatus.OK).body(usuario))
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-    }
-
-    @PutMapping("/actualizar/{id}")
-    public ResponseEntity<Usuario> actualizar(@PathVariable Long id, @Valid @RequestBody UsuarioDTO dto) {
-        Usuario datosNuevos = new Usuario();
-        datosNuevos.setNombre(dto.getNombre());
-        datosNuevos.setTelefono(dto.getTelefono());
-        datosNuevos.setRol(dto.getRol());
-
-        Usuario actualizado = usuarioService.actualizarUsuario(id, datosNuevos);
-        return ResponseEntity.status(HttpStatus.OK).body(actualizado);
-    }
-
-    @DeleteMapping("/desactivar/{id}")
-    public ResponseEntity<Usuario> desactivar(@PathVariable Long id) {
-        Usuario desactivado = usuarioService.desactivarUsuario(id);
-        return ResponseEntity.status(HttpStatus.OK).body(desactivado);
+    public ResponseEntity<Usuario> crearUsuario(@Valid @RequestBody UsuarioDTO usuarioDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.crearUsuario(usuarioDTO));
     }
 
     @PostMapping("/direcciones/crear")
-    public ResponseEntity<Direccion> registrarDireccion(@Valid @RequestBody DireccionDTO dto) {
-        Direccion direccion = new Direccion();
-        direccion.setComuna(dto.getComuna());
-        direccion.setCiudad(dto.getCiudad());
-        direccion.setCalle(dto.getCalle());
-        direccion.setNumero(dto.getNumero());
-        direccion.setUsuarioId(dto.getUsuarioId());
-
-        Direccion nueva = usuarioService.guardarDireccion(direccion);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nueva);
+    public ResponseEntity<Direccion> crearDireccion(@Valid @RequestBody DireccionDTO direccionDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.crearDireccion(direccionDTO));
     }
 
-    @GetMapping("/direcciones/usuario/{usuarioId}")
-    public ResponseEntity<List<Direccion>> obtenerDireccionesPorUsuario(@PathVariable Long usuarioId) {
-        List<Direccion> lista = usuarioService.listarDireccionesPorUsuario(usuarioId);
-        return ResponseEntity.status(HttpStatus.OK).body(lista);
+    @GetMapping("/listar")
+    public ResponseEntity<List<Usuario>> listarUsuarios(
+            @RequestParam(required = false) String rol,
+            @RequestParam(required = false) String estado) {
+        if (rol != null) {
+            return ResponseEntity.ok(usuarioService.listarPorRol(rol));
+        }
+        if (estado != null) {
+            return ResponseEntity.ok(usuarioService.listarPorEstado(estado));
+        }
+        return ResponseEntity.ok(usuarioService.listarTodos());
+    }
+
+    @GetMapping("/buscar/{id}")
+    public ResponseEntity<Usuario> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(usuarioService.buscarPorId(id));
+    }
+
+    @PutMapping("/actualizar/{id}")
+    public ResponseEntity<Usuario> actualizarUsuario(@PathVariable Long id, @Valid @RequestBody UsuarioDTO dto) {
+        return ResponseEntity.ok(usuarioService.actualizarUsuario(id, dto));
+    }
+
+    @PutMapping("/direcciones/actualizar/{id}")
+    public ResponseEntity<Direccion> actualizarDireccion(@PathVariable Long id, @Valid @RequestBody DireccionDTO dto) {
+        return ResponseEntity.ok(usuarioService.actualizarDireccion(id, dto));
+    }
+
+    @DeleteMapping("/desactivar/{id}")
+    public ResponseEntity<Usuario> desactivarUsuario(@PathVariable Long id) {
+        return ResponseEntity.ok(usuarioService.desactivarUsuario(id));
     }
 }
