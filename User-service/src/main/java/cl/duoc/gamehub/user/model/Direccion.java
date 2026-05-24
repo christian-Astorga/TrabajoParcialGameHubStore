@@ -33,7 +33,6 @@ public class Direccion {
     private Long usuarioId;
 
     public Direccion() {}
-
     // --- GETTERS Y SETTERS ---
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

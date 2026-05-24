@@ -1,14 +1,13 @@
-package cl.duoc.gamehub.product.client;
+package cl.duoc.gamehub.order.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import java.util.Map;
 
+@FeignClient(name = "product-service", url = "http://localhost:8082")
+public interface ProductoClient {
 
-@FeignClient(name = "category-service", url = "http://localhost:8084/api/categorias")
-public interface CategoriaClient {
-
-    @GetMapping("/buscar/{id}")
+    @GetMapping("/api/productos/buscar/{id}")
     Map<String, Object> buscarPorId(@PathVariable("id") Long id);
 }

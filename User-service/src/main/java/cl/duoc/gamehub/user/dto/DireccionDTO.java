@@ -21,7 +21,6 @@ public class DireccionDTO {
     private Long usuarioId;
 
     public DireccionDTO() {}
-
     // --- GETTERS Y SETTERS ---
     public String getComuna() { return comuna; }
     public void setComuna(String comuna) { this.comuna = comuna; }

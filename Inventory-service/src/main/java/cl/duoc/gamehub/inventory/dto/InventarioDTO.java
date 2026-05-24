@@ -18,7 +18,6 @@ public class InventarioDTO {
 
     @NotNull(message = "La ubicación en bodega es obligatoria.")
     private String ubicacion;
-
     // Getters y Setters
     public Long getProductoId() { return productoId; }
     public void setProductoId(Long productoId) { this.productoId = productoId; }

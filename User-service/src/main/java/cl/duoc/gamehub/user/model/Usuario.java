@@ -29,7 +29,6 @@ public class Usuario {
     private String estado; // "ACTIVO" o "INACTIVO"
 
     public Usuario() {}
-
     public Usuario(Long id, String nombre, String email, String telefono, String rol, String estado) {
         this.id = id;
         this.nombre = nombre;
@@ -38,7 +37,6 @@ public class Usuario {
         this.rol = rol;
         this.estado = estado;
     }
-
     // --- GETTERS Y SETTERS ---
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

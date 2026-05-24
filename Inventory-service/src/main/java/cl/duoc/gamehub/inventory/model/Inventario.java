@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "inventarios")
 public class Inventario {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,7 +26,6 @@ public class Inventario {
 
     // Constructores
     public Inventario() {}
-
     public Inventario(Long productoId, Integer stockDisponible, Integer stockReservado, Integer stockMinimo, String ubicacion) {
         this.productoId = productoId;
         this.stockDisponible = stockDisponible;
@@ -35,7 +33,6 @@ public class Inventario {
         this.stockMinimo = stockMinimo;
         this.ubicacion = ubicacion;
     }
-
     // Getters y Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

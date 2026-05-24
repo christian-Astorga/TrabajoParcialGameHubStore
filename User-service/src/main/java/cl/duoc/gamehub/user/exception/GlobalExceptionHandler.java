@@ -14,7 +14,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body("Error de validación: Verifique que los campos obligatorios del usuario o dirección sean correctos.");
     }
-
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> manejarErroresNegocio(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)

@@ -17,13 +17,11 @@ public class ProductoController {
 
     @Autowired
     private ProductoService productoService;
-
     // 1. CREAR
     @PostMapping("/crear")
     public ResponseEntity<Producto> registrarProducto(@Valid @RequestBody ProductoDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(productoService.guardarProducto(dto));
     }
-
     // 2. LISTAR (Con filtros incluidos)
     @GetMapping("/listar")
     public ResponseEntity<List<Producto>> obtenerCatalogo(
@@ -42,19 +40,16 @@ public class ProductoController {
         }
         return ResponseEntity.ok(productoService.listarTodos());
     }
-
     // 3. BUSCAR POR ID
     @GetMapping("/buscar/{id}")
     public ResponseEntity<Producto> obtenerPorId(@PathVariable Long id) {
         return ResponseEntity.ok(productoService.buscarPorId(id));
     }
-
     // 4. ACTUALIZAR
     @PutMapping("/actualizar/{id}")
     public ResponseEntity<Producto> actualizar(@PathVariable Long id, @Valid @RequestBody ProductoDTO dto) {
         return ResponseEntity.ok(productoService.actualizarProducto(id, dto));
     }
-
     // 5. DESACTIVAR
     @DeleteMapping("/desactivar/{id}")
     public ResponseEntity<Producto> desactivar(@PathVariable Long id) {

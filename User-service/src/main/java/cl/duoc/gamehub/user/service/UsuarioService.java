@@ -16,7 +16,6 @@ public class UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
-
     public Usuario registrarUsuario(UsuarioDTO dto) {
         log.info("[USER-SERVICE] Registrando nuevo usuario con email: {}", dto.getEmail());
         Usuario u = new Usuario();
@@ -27,19 +26,15 @@ public class UsuarioService {
         u.setEstado("ACTIVO");
         return usuarioRepository.save(u);
     }
-
     public List<Usuario> listarTodos() {
         return usuarioRepository.findAll();
     }
-
     public List<Usuario> listarPorRol(String rol) {
         return usuarioRepository.findByRol(rol.toUpperCase());
     }
-
     public List<Usuario> listarPorEstado(String estado) {
         return usuarioRepository.findByEstado(estado.toUpperCase());
     }
-
     public Usuario buscarPorId(Long id) {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> {
@@ -47,7 +42,6 @@ public class UsuarioService {
                     return new RuntimeException("Usuario no encontrado");
                 });
     }
-
     public Usuario actualizarUsuario(Long id, UsuarioDTO dto) {
         log.info("[USER-SERVICE] Actualizando datos para ID: {}", id);
         Usuario u = buscarPorId(id);
@@ -59,7 +53,6 @@ public class UsuarioService {
         }
         return usuarioRepository.save(u);
     }
-
     public Usuario desactivarUsuario(Long id) {
         log.warn("[USER-SERVICE] Desactivando lógicamente al usuario con ID: {}", id);
         Usuario u = buscarPorId(id);

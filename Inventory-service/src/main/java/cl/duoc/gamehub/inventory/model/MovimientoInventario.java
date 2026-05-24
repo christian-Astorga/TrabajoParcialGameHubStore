@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "movimientos_inventario")
 public class MovimientoInventario {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,7 +32,6 @@ public class MovimientoInventario {
         this.cantidad = cantidad;
         this.fecha = fecha;
     }
-
     // Getters y Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

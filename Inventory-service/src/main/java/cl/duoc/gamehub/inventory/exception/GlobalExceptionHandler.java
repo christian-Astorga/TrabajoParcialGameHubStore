@@ -13,7 +13,6 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
     @ExceptionHandler(FeignException.class)
     public ResponseEntity<Map<String, String>> errorDeComunicacionFeign(FeignException ex) {
         Map<String, String> errorJson = new HashMap<>();
@@ -24,14 +23,12 @@ public class GlobalExceptionHandler {
         }
         return new ResponseEntity<>(errorJson, HttpStatus.BAD_REQUEST);
     }
-
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, String>> erroresDeNegocio(RuntimeException ex) {
         Map<String, String> errorJson = new HashMap<>();
         errorJson.put("mensaje", ex.getMessage());
         return new ResponseEntity<>(errorJson, HttpStatus.BAD_REQUEST);
     }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> erroresDeValidacion(MethodArgumentNotValidException ex) {
         Map<String, String> errores = new HashMap<>();

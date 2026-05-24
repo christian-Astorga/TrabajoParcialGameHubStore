@@ -10,7 +10,6 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
     // Este metodo va a atrapar cuando Feign falle porque la categoría no existe
     @ExceptionHandler(FeignException.class)
     public ResponseEntity<Map<String, String>> errorDeComunicacionFeign(FeignException ex) {
@@ -23,7 +22,6 @@ public class GlobalExceptionHandler {
         }
         return new ResponseEntity<>(errorJson, HttpStatus.BAD_REQUEST);
     }
-
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, String>> erroresDeNegocio(RuntimeException ex) {
         Map<String, String> errorJson = new HashMap<>();
