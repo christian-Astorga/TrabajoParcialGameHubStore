@@ -35,5 +35,6 @@
 
     <modules>
         <module>auth-service</module>
+        <module>Product-service</module>
     </modules>
 </project>
