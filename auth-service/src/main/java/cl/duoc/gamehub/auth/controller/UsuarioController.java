@@ -2,6 +2,9 @@ package cl.duoc.gamehub.auth.controller;
 
 import cl.duoc.gamehub.auth.model.Usuario;
 import cl.duoc.gamehub.auth.service.UsuarioService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,15 +17,21 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
-    // Ruta para registrar un usuario: POST http://localhost:8081/auth/registrar
     @PostMapping("/registrar")
-    public String registrar(@RequestBody Usuario usuario) {
-        return usuarioService.registrarUsuario(usuario);
+    public ResponseEntity<String> registrar(@Valid @RequestBody Usuario usuario) {
+        String resultado = usuarioService.registrarUsuario(usuario);
+        if (resultado.startsWith("Error")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resultado);
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
     }
 
-    // Ruta para iniciar sesión: POST http://localhost:8081/auth/login
     @PostMapping("/login")
-    public String login(@RequestParam String username, @RequestParam String password) {
-        return usuarioService.iniciarSesion(username, password);
+    public ResponseEntity<String> login(@RequestParam String username, @RequestParam String password) {
+        String resultado = usuarioService.iniciarSesion(username, password);
+        if (resultado.startsWith("Error")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(resultado);
+        }
+        return ResponseEntity.ok(resultado);
     }
 }
