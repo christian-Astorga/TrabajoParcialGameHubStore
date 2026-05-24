@@ -38,5 +38,6 @@
         <module>Product-service</module>
         <module>User-service</module>
         <module>category-service</module>
+        <module>Inventory-service</module>
     </modules>
 </project>
