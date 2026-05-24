@@ -2,36 +2,28 @@ package cl.duoc.gamehub.auth.controller;
 
 import cl.duoc.gamehub.auth.model.Usuario;
 import cl.duoc.gamehub.auth.service.UsuarioService;
-import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class UsuarioController {
 
-    private final UsuarioService usuarioService;
+    @Autowired
+    private UsuarioService usuarioService;
 
-    public UsuarioController(UsuarioService usuarioService) {
-        this.usuarioService = usuarioService;
-    }
-
-    @PostMapping("/registrar")
-    public ResponseEntity<String> registrar(@Valid @RequestBody Usuario usuario) {
+    @PostMapping("/register")
+    public ResponseEntity<String> registrarUsuario(@RequestBody Usuario usuario) {
         String resultado = usuarioService.registrarUsuario(usuario);
-        if (resultado.startsWith("Error")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resultado);
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
-    }
 
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestParam String username, @RequestParam String password) {
-        String resultado = usuarioService.iniciarSesion(username, password);
+        // Si el servicio responde con un error, mandamos un BadRequest (400)
         if (resultado.startsWith("Error")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(resultado);
+            return new ResponseEntity<>(resultado, HttpStatus.BAD_REQUEST);
         }
-        return ResponseEntity.ok(resultado);
+
+        // Si todo sale bien, mandamos un Created (201) con el mensaje de éxito
+        return new ResponseEntity<>(resultado, HttpStatus.CREATED);
     }
 }
