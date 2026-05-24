@@ -21,51 +21,43 @@ public class ProductoController {
     // 1. CREAR
     @PostMapping("/crear")
     public ResponseEntity<Producto> registrarProducto(@Valid @RequestBody ProductoDTO dto) {
-        Producto producto = new Producto();
-        producto.setNombre(dto.getNombre());
-        producto.setMarca(dto.getMarca());
-        producto.setModelo(dto.getModelo());
-        producto.setPrecio(dto.getPrecio());
-        producto.setDescripcion(dto.getDescripcion());
-        producto.setEstado("ACTIVO");
-
-        Producto nuevo = productoService.guardarProducto(producto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevo);
+        return ResponseEntity.status(HttpStatus.CREATED).body(productoService.guardarProducto(dto));
     }
 
-    // 2. LISTAR
+    // 2. LISTAR (Con filtros incluidos)
     @GetMapping("/listar")
-    public ResponseEntity<List<Producto>> obtenerCatalogo() {
-        List<Producto> lista = productoService.listarTodos();
-        return ResponseEntity.status(HttpStatus.OK).body(lista);
+    public ResponseEntity<List<Producto>> obtenerCatalogo(
+            @RequestParam(required = false) Long categoriaId,
+            @RequestParam(required = false) String marca,
+            @RequestParam(required = false) String estado) {
+
+        if (categoriaId != null) {
+            return ResponseEntity.ok(productoService.listarPorCategoria(categoriaId));
+        }
+        if (marca != null) {
+            return ResponseEntity.ok(productoService.listarPorMarca(marca));
+        }
+        if (estado != null) {
+            return ResponseEntity.ok(productoService.listarPorEstado(estado));
+        }
+        return ResponseEntity.ok(productoService.listarTodos());
     }
 
     // 3. BUSCAR POR ID
     @GetMapping("/buscar/{id}")
     public ResponseEntity<Producto> obtenerPorId(@PathVariable Long id) {
-        return productoService.buscarPorId(id)
-                .map(producto -> ResponseEntity.status(HttpStatus.OK).body(producto))
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        return ResponseEntity.ok(productoService.buscarPorId(id));
     }
 
     // 4. ACTUALIZAR
     @PutMapping("/actualizar/{id}")
     public ResponseEntity<Producto> actualizar(@PathVariable Long id, @Valid @RequestBody ProductoDTO dto) {
-        Producto datosNuevos = new Producto();
-        datosNuevos.setNombre(dto.getNombre());
-        datosNuevos.setMarca(dto.getMarca());
-        datosNuevos.setModelo(dto.getModelo());
-        datosNuevos.setPrecio(dto.getPrecio());
-        datosNuevos.setDescripcion(dto.getDescripcion());
-
-        Producto actualizado = productoService.actualizarProducto(id, datosNuevos);
-        return ResponseEntity.status(HttpStatus.OK).body(actualizado);
+        return ResponseEntity.ok(productoService.actualizarProducto(id, dto));
     }
 
-
+    // 5. DESACTIVAR
     @DeleteMapping("/desactivar/{id}")
     public ResponseEntity<Producto> desactivar(@PathVariable Long id) {
-        Producto desactivado = productoService.desactivarProducto(id);
-        return ResponseEntity.status(HttpStatus.OK).body(desactivado);
+        return ResponseEntity.ok(productoService.desactivarProducto(id));
     }
 }

@@ -16,11 +16,12 @@ public class ProductoDTO {
     @Min(value = 1, message = "El precio debe ser mayor a cero")
     private Double precio;
 
-    @NotBlank(message = "La categoría es obligatoria")
-    private String categoria;
+    @NotNull(message = "El ID de categoría es obligatorio")
+    private Long categoriaId; // <--- Cambiado a Long para calzar con la ID
 
     private String descripcion;
 
+    private String estado;
 
     public ProductoDTO() {}
 
@@ -33,8 +34,10 @@ public class ProductoDTO {
     public void setModelo(String modelo) { this.modelo = modelo; }
     public Double getPrecio() { return precio; }
     public void setPrecio(Double precio) { this.precio = precio; }
-    public String getCategoria() { return categoria; }
-    public void setCategoria(String categoria) { this.categoria = categoria; }
+    public Long getCategoriaId() { return categoriaId; } // <--- Cambiado
+    public void setCategoriaId(Long categoriaId) { this.categoriaId = categoriaId; } // <--- Cambiado
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
 }

@@ -1,9 +1,12 @@
 package cl.duoc.gamehub.auth.service;
 
 import cl.duoc.gamehub.auth.dto.ActualizarCuentaDTO;
+import cl.duoc.gamehub.auth.dto.LoginRequestDTO;
 import cl.duoc.gamehub.auth.dto.RegistroRequestDTO;
 import cl.duoc.gamehub.auth.model.CuentaAcceso;
 import cl.duoc.gamehub.auth.repository.AuthRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,74 +17,112 @@ import java.util.Optional;
 @Service
 public class AuthService {
 
+    // 1. Inicialización de SLF4J
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
+
     @Autowired
     private AuthRepository authRepository;
 
-    // 1. Iniciar Sesión
+    // Conecta con: authService.autenticar(dto.getEmail(), dto.getPassword())
     public String autenticar(String email, String password) {
+        log.info("[AUTH-SERVICE] Procesando solicitud de inicio de sesión para el correo: {}", email);
+
         CuentaAcceso cuenta = authRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Credenciales invalidas: El correo no existe."));
+                .orElseThrow(() -> {
+                    log.error("[AUTH-SERVICE] Login Fallido: El correo '{}' no se encuentra registrado.", email);
+                    return new RuntimeException("Credenciales inválidas");
+                });
 
-        if ("INACTIVO".equals(cuenta.getEstado())) {
-            throw new RuntimeException("Acceso denegado: Usuario inactivo.");
+        // Verificación de contraseña plana frente a passwordHash
+        if (!cuenta.getPasswordHash().equals(password)) {
+            log.error("[AUTH-SERVICE] Login Fallido: Contraseña errónea para el usuario '{}'", email);
+            throw new RuntimeException("Credenciales inválidas");
         }
 
+        if ("INACTIVO".equalsIgnoreCase(cuenta.getEstado())) {
+            log.warn("[AUTH-SERVICE] Intento de acceso bloqueado: Cuenta bloqueada o INACTIVA para '{}'", email);
+            throw new RuntimeException("La cuenta se encuentra inactiva.");
+        }
 
-        String hashEsperado = "[BCRYPT_HASH_DE_" + password + "]";
-
-
-        return "JWT_TOKEN_VALIDO_ROL_" + cuenta.getRol();
+        log.info("[AUTH-SERVICE] Autenticación completada. Login Exitoso para el usuario: {}", email);
+        return "TOKEN_SIMULADO_GAMEHUB_SUCCESS";
     }
 
-
+    // Conecta con: authService.crearCuenta(dto)
     public CuentaAcceso crearCuenta(RegistroRequestDTO dto) {
-        if (authRepository.findByEmail(dto.getEmail()).isPresent()) {
-            throw new RuntimeException("El correo ya tiene una cuenta de acceso registrada.");
-        }
+        log.info("[AUTH-SERVICE] Solicitud de creación de cuenta nueva recibida para: {}", dto.getEmail());
 
-        CuentaAcceso nueva = new CuentaAcceso();
-        nueva.setEmail(dto.getEmail());
-        // Aplicación de Regla
-        nueva.setPasswordHash("[BCRYPT_HASH_DE_" + dto.getPassword() + "]");
-        nueva.setRol(dto.getRol().toUpperCase());
-        nueva.setEstado("ACTIVO");
-        nueva.setFechaCreacion(LocalDateTime.now());
+        // Evitar duplicados
+        authRepository.findByEmail(dto.getEmail()).ifPresent(c -> {
+            log.error("[AUTH-SERVICE] Registro denegado: El email {} ya existe en la plataforma.", dto.getEmail());
+            throw new RuntimeException("El correo ya está registrado.");
+        });
 
-        return authRepository.save(nueva);
+        CuentaAcceso nuevaCuenta = new CuentaAcceso();
+        nuevaCuenta.setEmail(dto.getEmail());
+        nuevaCuenta.setPasswordHash(dto.getPassword()); // Se almacena temporalmente como texto plano/hash simulado
+        nuevaCuenta.setRol(dto.getRol().toUpperCase());
+        nuevaCuenta.setEstado("ACTIVO");
+        nuevaCuenta.setFechaCreacion(LocalDateTime.now());
+
+        log.info("[AUTH-SERVICE] Registro exitoso. Guardando CuentaAcceso para '{}' con Rol: {}", dto.getEmail(), dto.getRol());
+        return authRepository.save(nuevaCuenta);
     }
 
-    // 3. CRUD: Listar cuentas
+    // Conecta con: authService.listarTodas()
     public List<CuentaAcceso> listarTodas() {
+        log.info("[AUTH-SERVICE] Solicitando listado completo de cuentas de usuario.");
         return authRepository.findAll();
     }
 
-    // 4. CRUD: Buscar por ID
+    // Conecta con: authService.buscarPorId(id)
     public Optional<CuentaAcceso> buscarPorId(Long id) {
+        log.info("[AUTH-SERVICE] Buscando cuenta asociada al ID de base de datos: {}", id);
         return authRepository.findById(id);
     }
 
-    // 4. CRUD: Buscar por Correo
+    // Conecta con: authService.buscarPorCorreo(email)
     public Optional<CuentaAcceso> buscarPorCorreo(String email) {
+        log.info("[AUTH-SERVICE] Buscando cuenta por criterio de Email: {}", email);
         return authRepository.findByEmail(email);
     }
 
-    // 5. CRUD: Actualizar contraseña, rol o estado
+    // Conecta con: authService.actualizar(id, dto)
     public CuentaAcceso actualizar(Long id, ActualizarCuentaDTO dto) {
-        return authRepository.findById(id).map(cuenta -> {
-            if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
-                cuenta.setPasswordHash("[BCRYPT_HASH_DE_" + dto.getPassword() + "]");
-            }
-            if (dto.getRol() != null) cuenta.setRol(dto.getRol().toUpperCase());
-            if (dto.getEstado() != null) cuenta.setEstado(dto.getEstado().toUpperCase());
-            return authRepository.save(cuenta);
-        }).orElseThrow(() -> new RuntimeException("Cuenta de acceso no encontrada"));
+        log.info("[AUTH-SERVICE] Solicitud recibida para actualizar parámetros de la cuenta ID: {}", id);
+
+        CuentaAcceso cuenta = authRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("[AUTH-SERVICE] Error en actualización: Cuenta con ID {} inexistente.", id);
+                    return new RuntimeException("Cuenta no encontrada");
+                });
+
+        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
+            log.info("[AUTH-SERVICE] Actualizando contraseña de acceso para ID: {}", id);
+            cuenta.setPasswordHash(dto.getPassword());
+        }
+        if (dto.getRol() != null && !dto.getRol().isBlank()) {
+            cuenta.setRol(dto.getRol().toUpperCase());
+        }
+        if (dto.getEstado() != null && !dto.getEstado().isBlank()) {
+            cuenta.setEstado(dto.getEstado().toUpperCase());
+        }
+
+        log.info("[AUTH-SERVICE] Modificaciones guardadas de manera exitosa para ID: {}", id);
+        return authRepository.save(cuenta);
     }
 
-    // 6. CRUD: Desactivar cuenta (Cumple Desactivación Lógica sin borrar compras)
+    // Conecta con: authService.desactivar(id)
     public CuentaAcceso desactivar(Long id) {
-        return authRepository.findById(id).map(cuenta -> {
-            cuenta.setEstado("INACTIVO");
-            return authRepository.save(cuenta);
-        }).orElseThrow(() -> new RuntimeException("Cuenta de acceso no encontrada"));
+        log.warn("[AUTH-SERVICE] Ejecutando restricción/desactivación lógica de la cuenta ID: {}", id);
+
+        CuentaAcceso cuenta = authRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("[AUTH-SERVICE] Error al desactivar: Cuenta con ID {} no encontrada.", id);
+                    return new RuntimeException("Cuenta no encontrada");
+                });
+
+        cuenta.setEstado("INACTIVO");
+        return authRepository.save(cuenta);
     }
 }

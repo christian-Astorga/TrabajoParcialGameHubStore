@@ -1,60 +1,72 @@
 package cl.duoc.gamehub.product.service;
 
+import cl.duoc.gamehub.product.dto.ProductoDTO;
 import cl.duoc.gamehub.product.model.Producto;
 import cl.duoc.gamehub.product.repository.ProductoRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProductoService {
 
+    // 1. Declaración del Logger para SLF4J
     private static final Logger log = LoggerFactory.getLogger(ProductoService.class);
 
     @Autowired
     private ProductoRepository productoRepository;
 
-    // Guardar un producto nuevo
-    public Producto guardarProducto(Producto producto) {
-        log.info("Guardando un nuevo producto: {}", producto.getNombre());
-        return productoRepository.save(producto);
+    public Producto guardarProducto(ProductoDTO dto) {
+        // estructurado de creación
+        log.info("[PRODUCT-SERVICE] Guardando nuevo producto gamer en catálogo: {}", dto.getNombre());
+
+        Producto p = new Producto();
+        p.setNombre(dto.getNombre());
+        p.setMarca(dto.getMarca());
+        p.setModelo(dto.getModelo());
+        p.setPrecio(dto.getPrecio());
+        p.setCategoriaId(dto.getCategoriaId());
+        p.setDescripcion(dto.getDescripcion());
+        p.setEstado("ACTIVO");
+        return productoRepository.save(p);
     }
 
-    // Listar todo el catálogo
-    public List<Producto> listarTodos() {
-        log.info("Listando todos los productos...");
-        return productoRepository.findAll();
+    public List<Producto> listarTodos() { return productoRepository.findAll(); }
+
+    public List<Producto> listarPorCategoria(Long id) { return productoRepository.findByCategoriaId(id); }
+
+    public List<Producto> listarPorMarca(String marca) { return productoRepository.findByMarca(marca); }
+
+    public List<Producto> listarPorEstado(String estado) { return productoRepository.findByEstado(estado.toUpperCase()); }
+
+    public Producto buscarPorId(Long id) {
+        return productoRepository.findById(id).orElseThrow(() -> {
+
+            log.error("[PRODUCT-SERVICE] Error: Producto con ID {} no existe en inventario", id);
+            return new RuntimeException("Producto no encontrado");
+        });
     }
 
-    // Buscar producto por ID
-    public Optional<Producto> buscarPorId(Long id) {
-        log.info("Buscando producto con ID: {}", id);
-        return productoRepository.findById(id);
+    public Producto actualizarProducto(Long id, ProductoDTO dto) {
+        // estructurado de actualización
+        log.info("[PRODUCT-SERVICE] Solicitud recibida para actualizar producto ID: {}", id);
+
+        Producto p = buscarPorId(id);
+        p.setNombre(dto.getNombre());
+        p.setPrecio(dto.getPrecio());
+        p.setDescripcion(dto.getDescripcion());
+        if (dto.getEstado() != null) p.setEstado(dto.getEstado().toUpperCase());
+        return productoRepository.save(p);
     }
 
-    // Actualizar producto completo
-    public Producto actualizarProducto(Long id, Producto datosNuevos) {
-        log.info("Actualizando datos del producto con ID: {}", id);
-        return productoRepository.findById(id).map(producto -> {
-            producto.setNombre(datosNuevos.getNombre());
-            producto.setMarca(datosNuevos.getMarca());
-            producto.setModelo(datosNuevos.getModelo());
-            producto.setPrecio(datosNuevos.getPrecio());
-            producto.setDescripcion(datosNuevos.getDescripcion());
-            return productoRepository.save(producto);
-        }).orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-    }
-
-    // Desactivar producto (Eliminación lógica exigida por rúbrica)
     public Producto desactivarProducto(Long id) {
-        log.info("Desactivando lógicamente el producto con ID: {}", id);
-        return productoRepository.findById(id).map(producto -> {
-            producto.setEstado("INACTIVO");
-            return productoRepository.save(producto);
-        }).orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+        //  advertencia por desactivación
+        log.warn("[PRODUCT-SERVICE] Ejecutando desactivación lógica (no física) para el ID: {}", id);
+
+        Producto p = buscarPorId(id);
+        p.setEstado("INACTIVO");
+        return productoRepository.save(p);
     }
 }
