@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,7 +54,7 @@ public class PagoService {
         pago.setMetodo(request.getMetodo().toUpperCase());
         pago.setEstado("PROCESADO");
         pago.setCodigoTransaccion("TX-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
-        pago.setFecha(LocalDateTime.now());
+        pago.setFecha(LocalDate.now());
 
         Pago guardado = pagoRepository.save(pago);
         log.info("[EXITO] Pago registrado de forma conforme en Laragon.");

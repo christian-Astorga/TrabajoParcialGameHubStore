@@ -1,8 +1,8 @@
 package cl.duoc.gamehub.payment.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "pagos")
@@ -12,24 +12,19 @@ public class Pago {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "orden_id", nullable = false)
+    @Column(name = "orden_id")
     private Long ordenId;
 
-    @Column(nullable = false)
     private Double monto;
-
-    @Column(nullable = false)
     private String metodo;
-
-    @Column(nullable = false)
     private String estado;
 
-    @Column(name = "codigo_transaccion", nullable = false, unique = true)
+    @Column(name = "codigo_transaccion")
     private String codigoTransaccion;
 
-    @Column(nullable = false)
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-    private LocalDateTime fecha;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @Column(columnDefinition = "DATE")
+    private LocalDate fecha;
 
     public Pago() {}
 
@@ -51,6 +46,6 @@ public class Pago {
     public String getCodigoTransaccion() { return codigoTransaccion; }
     public void setCodigoTransaccion(String codigoTransaccion) { this.codigoTransaccion = codigoTransaccion; }
 
-    public LocalDateTime getFecha() { return fecha; }
-    public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
+    public LocalDate getFecha() { return fecha; }
+    public void setFecha(LocalDate fecha) { this.fecha = fecha; }
 }
