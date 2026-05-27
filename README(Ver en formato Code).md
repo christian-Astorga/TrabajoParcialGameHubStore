@@ -27,6 +27,16 @@ El diseño, construcción, documentación y pruebas de este ecosistema de micros
 * Asignatura: Desarrollo FullStack I
 * Fecha actual: 26/05/2026
 
+* Pasos para la Ejecución del Proyecto (Localhost)
+
+Siga estrictamente el siguiente orden secuencial para compilar, configurar y levantar el ecosistema distribuido de GameHub Store en su entorno local.
+
+# Requisitos Previos
+* Java JDK: Versión 17 instalada y configurada en las variables de entorno.
+* Gestor de Base de Datos: PostgreSQL o MySQL activo localmente (según los perfiles activos),(Se uso Laragon para este proyecto, con HeidiSQL).
+* Herramientas: Maven
+* Springs Boots: Exportados en cada archivo POM.xml de cada Microservicio.
+
 
 MICROSERVICIO: auth-service (Puerto 8081)
 Persistencia: Base de datos gamehub_auth
