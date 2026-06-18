@@ -1,11 +1,7 @@
 package cl.duoc.gamehub.payment.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "pagos")
@@ -15,28 +11,27 @@ public class Pago {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "El ID de la orden no puede ser nulo")
-    @Column(name = "orden_id")
+    @Column(name = "orden_id", nullable = false)
     private Long ordenId;
 
-    @NotNull(message = "El monto no puede ser nulo")
-    @Positive(message = "El monto debe ser un valor positivo")
+    @Column(nullable = false)
     private Double monto;
 
-    @NotBlank(message = "El método de pago es obligatorio")
-    private String metodo;
+    @Column(name = "metodo_pago", nullable = false)
+    private String metodoPago;
 
-    private String estado;
+    @Column(nullable = false)
+    private String estado; // APROBADO, RECHAZADO
 
-    @Column(name = "codigo_transaccion")
-    private String codigoTransaccion;
+    @Column(name = "transaccion_id", unique = true, nullable = false)
+    private String transaccionId;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    @Column(columnDefinition = "DATE")
-    private LocalDate fecha;
+    @Column(nullable = false)
+    private LocalDateTime fecha;
 
     public Pago() {}
 
+    // Getters y Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -46,15 +41,15 @@ public class Pago {
     public Double getMonto() { return monto; }
     public void setMonto(Double monto) { this.monto = monto; }
 
-    public String getMetodo() { return metodo; }
-    public void setMetodo(String metodo) { this.metodo = metodo; }
+    public String getMetodoPago() { return metodoPago; }
+    public void setMetodoPago(String metodoPago) { this.metodoPago = metodoPago; }
 
     public String getEstado() { return estado; }
     public void setEstado(String estado) { this.estado = estado; }
 
-    public String getCodigoTransaccion() { return codigoTransaccion; }
-    public void setCodigoTransaccion(String codigoTransaccion) { this.codigoTransaccion = codigoTransaccion; }
+    public String getTransaccionId() { return transaccionId; }
+    public void setTransaccionId(String transaccionId) { this.transaccionId = transaccionId; }
 
-    public LocalDate getFecha() { return fecha; }
-    public void setFecha(LocalDate fecha) { this.fecha = fecha; }
+    public LocalDateTime getFecha() { return fecha; }
+    public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
 }

@@ -1,18 +1,18 @@
 server:
-  port: 8087
+  port: 8085
 
 spring:
   application:
-    name: payment-service
+    name: inventory-service
 
-  # Configuración de la Base de Datos en Laragon
+  # Configuración de la Base de Datos en Laragon para Inventarios
   datasource:
-    url: jdbc:mysql://localhost:3306/gamehub_payment_db?createDatabaseIfNotExist=true&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/gamehub_inventory_db?createDatabaseIfNotExist=true&serverTimezone=UTC
     username: root
     password:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-
+  # Configuración de Hibernate / JPA
   jpa:
     hibernate:
       ddl-auto: update
@@ -21,7 +21,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
 
-
+# Registro en el Servidor de Descubrimiento Eureka
 eureka:
   client:
     service-url:
@@ -29,7 +29,7 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
 
-
+# Configuración de la documentación interactiva Swagger / OpenAPI
 springdoc:
   api-docs:
     path: /api-docs

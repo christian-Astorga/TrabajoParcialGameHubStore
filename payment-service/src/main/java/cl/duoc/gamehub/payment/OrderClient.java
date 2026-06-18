@@ -1,18 +1,14 @@
-package cl.duoc.gamehub.payment;
+package cl.duoc.gamehub.payment.client;
 
-import cl.duoc.gamehub.payment.dto.OrderExternalDTO;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "order-service", url = "http://localhost:8086/api/ordenes")
+@FeignClient(name = "order-service", path = "/api/ordenes")
 public interface OrderClient {
 
-    @GetMapping("/buscar/{id}")
-    OrderExternalDTO buscarOrdenPorId(@PathVariable("id") Long id);
-
+    // Cambia el estado de la orden en el puerto 8086 cuando el pago se concrete
     @PutMapping("/actualizar-estado/{id}")
-    void actualizarEstadoOrden(@PathVariable("id") Long id, @RequestParam("estado") String estado);
+    Object actualizarEstado(@PathVariable("id") Long id, @RequestParam("estado") String estado);
 }
