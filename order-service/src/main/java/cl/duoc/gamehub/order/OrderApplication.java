@@ -13,6 +13,6 @@ public class OrderApplication {
     private static final Logger log = LoggerFactory.getLogger(OrderApplication.class);
     public static void main(String[] args) {
         SpringApplication.run(OrderApplication.class, args);
-        log.info("[GAMEHUB-STORE] Microservicio Order-Service iniciado y escuchando peticiones en el puerto 8086.");
+
     }
 }
