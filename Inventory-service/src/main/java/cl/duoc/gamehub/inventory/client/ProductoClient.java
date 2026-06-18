@@ -5,8 +5,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 
-@FeignClient(name = "product-service", url = "http://localhost:8082")
+@FeignClient(name = "product-service", path = "/api/productos")
 public interface ProductoClient {
-    @GetMapping("/api/productos/buscar/{id}")
-    void  buscarPorId(@PathVariable("id") Long id);
+
+    @GetMapping("/buscar/{id}")
+    Object buscarPorId(@PathVariable("id") Long id);
+    
 }
