@@ -1,6 +1,9 @@
 package cl.duoc.gamehub.payment.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 
@@ -12,11 +15,17 @@ public class Pago {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "El ID de la orden no puede ser nulo")
     @Column(name = "orden_id")
     private Long ordenId;
 
+    @NotNull(message = "El monto no puede ser nulo")
+    @Positive(message = "El monto debe ser un valor positivo")
     private Double monto;
+
+    @NotBlank(message = "El método de pago es obligatorio")
     private String metodo;
+
     private String estado;
 
     @Column(name = "codigo_transaccion")
