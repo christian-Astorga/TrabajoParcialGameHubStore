@@ -1,0 +1,10 @@
+server:
+  port: 8761
+spring:
+  application:
+    name: eureka-server
+
+eureka:
+  client:
+    registerWithEureka: false  # Falso, porque es el servidor, no un cliente
+    fetchRegistry: false       # Falso, no necesita descargar ninguna lista externa

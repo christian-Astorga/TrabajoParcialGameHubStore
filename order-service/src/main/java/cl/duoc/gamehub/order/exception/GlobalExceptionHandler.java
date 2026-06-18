@@ -1,4 +1,4 @@
-package cl.duoc.gamehub.order.exception;
+package cl.duoc.gamehub.order.controller.model.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
