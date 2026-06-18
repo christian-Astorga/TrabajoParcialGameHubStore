@@ -1,85 +1,69 @@
 package cl.duoc.gamehub.product.service;
 
-import cl.duoc.gamehub.product.dto.ProductoDTO;
+import cl.duoc.gamehub.product.client.CategoriaClient;
 import cl.duoc.gamehub.product.model.Producto;
 import cl.duoc.gamehub.product.repository.ProductoRepository;
-import cl.duoc.gamehub.product.client.CategoriaClient; // Importante para OpenFeign
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class ProductoService {
 
     private static final Logger log = LoggerFactory.getLogger(ProductoService.class);
-    @Autowired
-    private ProductoRepository productoRepository;
-    @Autowired
-    private CategoriaClient categoriaClient; // Inyección de nuestro puente OpenFeign
-    public Producto guardarProducto(ProductoDTO dto) {
-        log.info("[PRODUCT-SERVICE] Guardando nuevo producto gamer en catálogo: {}. Validando categoría ID: {}", dto.getNombre(), dto.getCategoriaId());
 
-        // LLAMADA PURA DE OPENFEIGN (Deja que viaje la excepción si la categoría no existe)
-        Map<String, Object> categoria = categoriaClient.buscarPorId(dto.getCategoriaId());
+    @Autowired
+    private ProductoRepository repository;
 
-        if (categoria != null) {
-            String estado = (String) categoria.get("estado");
-            if (estado != null && estado.equals("INACTIVO")) {
-                log.error("[PRODUCT-SERVICE] Error de negocio: La categoría ID {} está INACTIVA.", dto.getCategoriaId());
-                throw new RuntimeException("No se pueden asociar productos a una categoría inactiva.");
-            }
-            log.info("[PRODUCT-SERVICE] Validación exitosa. La categoría '{}' está ACTIVA.", categoria.get("nombre"));
+    @Autowired
+    private CategoriaClient categoriaClient; // Inyección con el nombre correcto en español
+
+    public Producto crear(Producto producto) {
+        log.info("[PRODUCT-SERVICE] Validando existencia de categoría ID: {}", producto.getCategoriaId());
+
+        try {
+            // Comunicación remota vía OpenFeign usando CategoriaClient
+            categoriaClient.buscarPorId(producto.getCategoriaId());
+        } catch (Exception e) {
+            log.error("[PRODUCT-SERVICE] Error: La categoría {} no existe en el sistema.", producto.getCategoriaId());
+            throw new RuntimeException("No se puede crear el producto: La categoría especificada no existe.");
         }
-        // Lógica de guardado que ya tenías impecable
-        Producto p = new Producto();
-        p.setNombre(dto.getNombre());
-        p.setMarca(dto.getMarca());
-        p.setModelo(dto.getModelo());
-        p.setPrecio(dto.getPrecio());
-        p.setCategoriaId(dto.getCategoriaId());
-        p.setDescripcion(dto.getDescripcion());
-        p.setEstado("ACTIVO");
-        return productoRepository.save(p);
+
+        producto.setEstado("ACTIVO");
+        log.info("[PRODUCT-SERVICE] Producto '{}' guardado con éxito.", producto.getNombre());
+        return repository.save(producto);
     }
-    public List<Producto> listarTodos() { return productoRepository.findAll(); }
-    public List<Producto> listarPorCategoria(Long id) { return productoRepository.findByCategoriaId(id); }
-    public List<Producto> listarPorMarca(String marca) { return productoRepository.findByMarca(marca); }
-    public List<Producto> listarPorEstado(String estado) { return productoRepository.findByEstado(estado.toUpperCase()); }
+
+    public List<Producto> listarTodos() {
+        log.info("[PRODUCT-SERVICE] Listando todos los productos del catálogo.");
+        return repository.findAll();
+    }
+
     public Producto buscarPorId(Long id) {
-        return productoRepository.findById(id).orElseThrow(() -> {
-            log.error("[PRODUCT-SERVICE] Error: Producto con ID {} no existe en inventario", id);
-            return new RuntimeException("Producto no encontrado");
-        });
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado con ID: " + id));
     }
-    public Producto actualizarProducto(Long id, ProductoDTO dto) {
-        log.info("[PRODUCT-SERVICE] Solicitud recibida para actualizar producto ID: {}", id);
 
-        Producto p = buscarPorId(id);
-        // Validación extra si intentan cambiar la categoría en la edición
-        if (dto.getCategoriaId() != null && !dto.getCategoriaId().equals(p.getCategoriaId())) {
-            Map<String, Object> categoria = categoriaClient.buscarPorId(dto.getCategoriaId());
-            if (categoria != null) {
-                String estado = (String) categoria.get("estado");
-                if (estado != null && estado.equals("INACTIVO")) {
-                    throw new RuntimeException("No se pueden asociar productos a una categoría inactiva.");
-                }
-            }
-            p.setCategoriaId(dto.getCategoriaId());
-        }
-        p.setNombre(dto.getNombre());
-        p.setPrecio(dto.getPrecio());
-        p.setDescripcion(dto.getDescripcion());
-        if (dto.getEstado() != null) p.setEstado(dto.getEstado().toUpperCase());
-        return productoRepository.save(p);
+    public List<Producto> listarPorCategoria(Long categoriaId) {
+        return repository.findByCategoriaId(categoriaId);
     }
-    public Producto desactivarProducto(Long id) {
-        log.warn("[PRODUCT-SERVICE] Ejecutando desactivación lógica (no física) para el ID: {}", id);
 
-        Producto p = buscarPorId(id);
-        p.setEstado("INACTIVO");
-        return productoRepository.save(p);
+    public Producto actualizar(Long id, Producto datos) {
+        log.info("[PRODUCT-SERVICE] Actualizando datos del producto ID: {}", id);
+        Producto prod = buscarPorId(id);
+        prod.setNombre(datos.getNombre());
+        prod.setDescripcion(datos.getDescripcion());
+        prod.setPrecio(datos.getPrecio());
+        if (datos.getEstado() != null) prod.setEstado(datos.getEstado().toUpperCase());
+        return repository.save(prod);
+    }
+
+    public Producto desactivar(Long id) {
+        log.warn("[PRODUCT-SERVICE] Desactivando lógicamente el producto ID: {}", id);
+        Producto prod = buscarPorId(id);
+        prod.setEstado("INACTIVO");
+        return repository.save(prod);
     }
 }
