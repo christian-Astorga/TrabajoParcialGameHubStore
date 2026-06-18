@@ -2,17 +2,14 @@ package cl.duoc.gamehub.order;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @SpringBootApplication
-@EnableFeignClients(basePackages = "cl.duoc.gamehub.order.client")
+@EnableDiscoveryClient
+@EnableFeignClients // Vital: Permite al servicio conectarse con user, product e inventory
 public class OrderApplication {
-
-    private static final Logger log = LoggerFactory.getLogger(OrderApplication.class);
     public static void main(String[] args) {
         SpringApplication.run(OrderApplication.class, args);
-
     }
 }
