@@ -8,18 +8,41 @@ spring:
   cloud:
     gateway:
       routes:
-
-        - id: payment-service-route
-          uri: lb://payment-service
+        # Enrutamiento hacia el Microservicio de Autenticación
+        - id: auth-route
+          uri: lb://auth-service
           predicates:
-            - Path=/api/pagos/**
+            - Path=/api/auth/**
 
+        # Enrutamiento hacia el Microservicio de Usuarios
+        - id: user-route
+          uri: lb://user-service
+          predicates:
+            - Path=/api/usuarios/**
 
-        - id: product-service-route
-          uri: lb://Product-service
+        # Enrutamiento hacia el Microservicio de Productos
+        - id: product-route
+          uri: lb://product-service
           predicates:
             - Path=/api/productos/**
 
+        # Enrutamiento hacia el Microservicio de Inventario
+        - id: inventory-route
+          uri: lb://inventory-service
+          predicates:
+            - Path=/api/inventario/**
+
+        # Enrutamiento hacia el Microservicio de Órdenes
+        - id: order-route
+          uri: lb://order-service
+          predicates:
+            - Path=/api/ordenes/**
+
+        # Enrutamiento hacia el Microservicio de Pagos
+        - id: payment-route
+          uri: lb://payment-service
+          predicates:
+            - Path=/api/pagos/**
 
 eureka:
   client:
