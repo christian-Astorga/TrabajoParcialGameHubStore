@@ -1,4 +1,4 @@
-package cl.duoc.gamehub.order.controller.model;
+package cl.duoc.gamehub.order.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
