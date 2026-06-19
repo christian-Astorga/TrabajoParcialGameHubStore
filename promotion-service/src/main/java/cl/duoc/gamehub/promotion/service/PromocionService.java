@@ -7,6 +7,7 @@ import cl.duoc.gamehub.promotion.repository.PromocionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,6 +22,7 @@ public class PromocionService {
         this.promocionRepository = promocionRepository;
     }
 
+    @Transactional
     public Promocion crearPromocion(PromotionRequestDTO request) {
         log.info("[AUDITORIA] Registrando nueva promocion con codigo: {}", request.getCodigo());
 
@@ -46,6 +48,7 @@ public class PromocionService {
         return promocionRepository.save(promo);
     }
 
+    @Transactional
     public Promocion validarYAplicarCupon(ValidateCouponDTO validacion) {
         log.info("[VALIDACION] Procesando cupon: {} para una orden de total: ${}", validacion.getCodigo(), validacion.getTotalOrden());
 
@@ -102,6 +105,7 @@ public class PromocionService {
                 .orElseThrow(() -> new IllegalArgumentException("No se encontro ninguna promocion con el codigo: " + codigo));
     }
 
+    @Transactional
     public Promocion actualizarFechasYCondiciones(Long id, LocalDate nuevaFechaFin, Integer nuevosUsosMax) {
         log.info("[AUDITORIA] Modificando condiciones de la promocion ID: {}", id);
         Promocion promo = buscarPorId(id);
@@ -126,6 +130,7 @@ public class PromocionService {
         return promocionRepository.save(promo);
     }
 
+    @Transactional
     public void desactivarPromocion(Long id) {
         log.info("[AUDITORIA] Desactivando cupon ID: {}", id);
         Promocion promo = buscarPorId(id);
