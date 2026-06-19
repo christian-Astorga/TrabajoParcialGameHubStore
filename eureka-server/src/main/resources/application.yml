@@ -1,10 +1,18 @@
 server:
   port: 8761
+
 spring:
   application:
     name: eureka-server
 
 eureka:
+  instance:
+    hostname: localhost
+  server:
+    enable-self-preservation: false
+    eviction-interval-timer-in-ms: 5000
   client:
-    registerWithEureka: false  # Falso, porque es el servidor, no un cliente
-    fetchRegistry: false       # Falso, no necesita descargar ninguna lista externa
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
