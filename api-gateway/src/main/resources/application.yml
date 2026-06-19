@@ -4,51 +4,76 @@ server:
 spring:
   application:
     name: api-gateway
-
   cloud:
     gateway:
+      discovery:
+        locator:
+          enabled: true # Enrutamiento dinámico mediante mapas de Eureka
       routes:
-        # Enrutamiento hacia el Microservicio de Autenticación
-        - id: auth-route
+        # 1. Microservicio de Autenticación y Seguridad (auth-service)
+        - id: auth-service
           uri: lb://auth-service
           predicates:
             - Path=/api/auth/**
 
-        # Enrutamiento hacia el Microservicio de Usuarios
-        - id: user-route
+        # 2. Microservicio de Gestión de Usuarios (user-service)
+        - id: user-service
           uri: lb://user-service
           predicates:
             - Path=/api/usuarios/**
 
-        # Enrutamiento hacia el Microservicio de Productos
-        - id: product-route
+        # 3. Microservicio de Catálogo de Videojuegos (product-service)
+        - id: product-service
           uri: lb://product-service
           predicates:
             - Path=/api/productos/**
 
-        # Enrutamiento hacia el Microservicio de Inventario
-        - id: inventory-route
+        # 4. Microservicio de Categorías y Géneros (category-service)
+        - id: category-service
+          uri: lb://category-service
+          predicates:
+            - Path=/api/categorias/**
+
+        # 5. Microservicio de Stock y Almacén (inventory-service)
+        - id: inventory-service
           uri: lb://inventory-service
           predicates:
             - Path=/api/inventario/**
 
-        # Enrutamiento hacia el Microservicio de Órdenes
-        - id: order-route
+        # 6. Microservicio de Órdenes de Compra (order-service)
+        - id: order-service
           uri: lb://order-service
           predicates:
             - Path=/api/ordenes/**
 
-        # Enrutamiento hacia el Microservicio de Pagos
-        - id: payment-route
+        # 7. Microservicio de Pasarela de Pagos (payment-service)
+        - id: payment-service
           uri: lb://payment-service
           predicates:
             - Path=/api/pagos/**
 
+        # 8. Microservicio de Despachos y Logística (shipping-service)
+        - id: shipping-service
+          uri: lb://shipping-service
+          predicates:
+            - Path=/api/despachos/**
+
+        # 9. Microservicio de Cupones y Descuentos (promotion-service)
+        - id: promotion-service
+          uri: lb://promotion-service
+          predicates:
+            - Path=/api/promociones/**
+
+        # 10. Microservicio de Reseñas y Calificaciones (review-service)
+        - id: review-service
+          uri: lb://review-service
+          predicates:
+            - Path=/api/reseñas/**
+
+# Central de Descubrimiento de Servicios
 eureka:
   client:
-    serviceUrl:
+    service-url:
       defaultZone: http://localhost:8761/eureka/
-    registerWithEureka: true
-    fetchRegistry: true
-  instance:
-    preferIpAddress: true
+    register-with-eureka: true
+    fetch-registry: true

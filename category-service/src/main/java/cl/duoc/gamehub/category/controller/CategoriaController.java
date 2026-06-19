@@ -43,7 +43,7 @@ public class CategoriaController {
     }
 
     @GetMapping("/buscar/{id}")
-    @Operation(summary = "Buscar categoría por ID", description = "Endpoint clave consumido por OpenFeign desde product-service")
+    @Operation(summary = "Buscar categoría por ID", description = "Endpoint clave")
     public ResponseEntity<EntityModel<Categoria>> buscarPorId(@PathVariable Long id) {
         Categoria categoria = categoriaService.buscarPorId(id);
         return ResponseEntity.ok(mapearHateoas(categoria));
@@ -63,7 +63,7 @@ public class CategoriaController {
         return ResponseEntity.ok(mapearHateoas(desactivada));
     }
 
-    // Método auxiliar para construir los enlaces HATEOAS exigidos en la rúbrica
+
     private EntityModel<Categoria> mapearHateoas(Categoria categoria) {
         Link selfLink = linkTo(methodOn(CategoriaController.class).buscarPorId(categoria.getId())).withSelfRel();
         Link listarLink = linkTo(methodOn(CategoriaController.class).listar()).withRel("lista_completa");
