@@ -11,7 +11,9 @@ El sistema está construido bajo una arquitectura de **microservicios**, garanti
 * **OpenFeign** (Comunicación síncrona entre microservicios)
 * **JUnit 5 & Mockito** (Pruebas unitarias y simulaciones)
 * **Maven**
-  (no recuerdo más)
+* **Eureka**
+* **Api Gateway**
+* **Swagger Hateoas**
 
 ## Arquitectura del Sistema
 El ecosistema se compone de 10 microservicios independientes, cada uno responsable de un dominio específico:
